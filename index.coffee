@@ -60,42 +60,53 @@ exports.process = (validationModel, params, req, errors = [], prefix = "") ->
           code: "TypeError"
     else
       if "type" in _.keys validationRules
-        if _.has validationRules, "required"
-          unless exports.rules.required validationRules.required, params[key]
-            errors.push
-              field: prefix + key
-              code: "Missing"
-          if validationRules.required is true and not validationRules.type.call(req, params[key])
-            errors.push
-              field: prefix + key
-              code: "TypeError"
-        else
+        unless _.has validationRules, "required"
+          validationRules.required = true
+
+        unless validationRules.required is false and typeof(params[key]) is "undefined"
+
           unless validationRules.type.call(req, params[key])
             errors.push
               field: prefix + key
               code: "TypeError"
-        if _.has validationRules, "in"
-          unless exports.rules.in validationRules.in, params[key]
+
+          unless exports.rules.required validationRules.required, params[key]
             errors.push
               field: prefix + key
-              code: "In"
-        if _.has validationRules, "notIn"
-          unless exports.rules.notIn validationRules.notIn, params[key]
-            errors.push
-              field: prefix + key
-              code: "NotIn"
-        if _.has validationRules, "equal"
-          unless exports.rules.equal validationRules.equal, params[key]
-            errors.push
-              field: prefix + key
-              code: "Equal"
-        if _.has validationRules, "notEqual"
-          unless exports.rules.notequal validationRules.notEqual, params[key]
-            errors.push
-              field: prefix + key
-              code: "NotEqual"
+              code: "Missing"
+
+          if _.has validationRules, "in"
+            unless exports.rules.in validationRules.in, params[key]
+              errors.push
+                field: prefix + key
+                code: "In"
+
+          if _.has validationRules, "notIn"
+            unless exports.rules.notIn validationRules.notIn, params[key]
+              errors.push
+                field: prefix + key
+                code: "NotIn"
+
+          if _.has validationRules, "equal"
+            unless exports.rules.equal validationRules.equal, params[key]
+              errors.push
+                field: prefix + key
+                code: "Equal"
+
+          if _.has validationRules, "notEqual"
+            unless exports.rules.notequal validationRules.notEqual, params[key]
+              errors.push
+                field: prefix + key
+                code: "NotEqual"
       else
-        return exports.process validationRules, params[key], req, errors, key + "."
+
+        if typeof(params[key]) is "undefined"
+          errors.push
+            field: prefix + key
+            code: "Missing"
+        else
+          return exports.process validationRules, params[key], req, errors, key + "."
+
   return errors
 
 exports.validationPlugin = ->
