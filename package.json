@@ -1,0 +1,26 @@
+{
+  "name": "restify-validation",
+  "version": "0.0.1",
+  "private": false,
+  "author": {
+    "name": "faceair <faceair.zh@gmail.com>"
+  },
+  "license": "MIT",
+  "keywords": [
+    "rest",
+    "api",
+    "restify",
+    "validation"
+  ],
+  "main": "index",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/faceair/restify-validation.git"
+  },
+  "bugs": {
+    "url": "https://github.com/faceair/restify-validation/issues"
+  },
+  "dependencies": {
+    "underscore": "~1.6.0"
+  }
+}

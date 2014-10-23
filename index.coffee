@@ -32,7 +32,7 @@ exports.rules =
   required: (param, value) ->
     unless _.isBoolean param
       return false
-    if param and typeof value is "undefined"
+    if param and typeof(value) is "undefined"
       return false
     return true
 
@@ -51,24 +51,29 @@ exports.rules =
   notEqual: (param, value) ->
     return not exports.rules.equal param, value
 
-exports.process = (validationModel, params, errors = [], prefix = "") ->
+exports.process = (validationModel, params, req, errors = [], prefix = "") ->
   _.each validationModel, (validationRules, key) ->
     if _.isFunction validationRules
-      if not _.has(params, key) or not validationRules(params[key])
+      if not _.has(params, key) or not validationRules.call(req, params[key])
         errors.push
           field: prefix + key
           code: "TypeError"
     else
       if "type" in _.keys validationRules
-        unless validationRules.type params[key]
-          errors.push
-            field: prefix + key
-            code: "TypeError"
         if _.has validationRules, "required"
           unless exports.rules.required validationRules.required, params[key]
             errors.push
               field: prefix + key
               code: "Missing"
+          if validationRules.required is true and not validationRules.type.call(req, params[key])
+            errors.push
+              field: prefix + key
+              code: "TypeError"
+        else
+          unless validationRules.type.call(req, params[key])
+            errors.push
+              field: prefix + key
+              code: "TypeError"
         if _.has validationRules, "in"
           unless exports.rules.in validationRules.in, params[key]
             errors.push
@@ -90,13 +95,13 @@ exports.process = (validationModel, params, errors = [], prefix = "") ->
               field: prefix + key
               code: "NotEqual"
       else
-        return exports.process validationRules, params[key], errors, key + "."
+        return exports.process validationRules, params[key], req, errors, key + "."
   return errors
 
 exports.validationPlugin = ->
   return (req, res, next) ->
     if req.route
-      errors = exports.process req.route.validation, req.params
+      errors = exports.process req.route.validation, req.params, req
       if errors.length > 0
         return res.send 400,
           status: "Validation Failed"
