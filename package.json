@@ -1,6 +1,6 @@
 {
   "name": "restify-validation",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "private": false,
   "author": {
     "name": "faceair <faceair.zh@gmail.com>"
@@ -21,6 +21,6 @@
     "url": "https://github.com/faceair/restify-validation/issues"
   },
   "dependencies": {
-    "underscore": "~1.6.0"
+    "underscore": "^1.7.0"
   }
 }
